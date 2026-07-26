@@ -1,6 +1,6 @@
 import math
 from nicegui import ui
-import qrcode
+#import qrcode
 import os
 
 from nicegui import app, ui
@@ -105,8 +105,8 @@ def logout() -> None:
 @ui.page('/')
 def main():
 
-    qr_code = qrcode.make('https://www.google.com')
-    qr_code.save('qr_code.png')
+    #qr_code = qrcode.make('https://www.google.com')
+    #qr_code.save('qr_code.png')
 
     ui.add_head_html('''
 <style>
@@ -187,8 +187,10 @@ body {
 
 
 
-    IMAGES_DIR = r"C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\nicegui"
-    app.add_static_files('/assets', IMAGES_DIR)
+    #IMAGES_DIR = r"C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\nicegui"
+    
+    BASE_DIR = Path(__file__).parent
+    app.add_static_files('/filez', BASE_DIR / 'filez')
 
 
     with ui.left_drawer(value=False).props('behavior=mobile overlay').classes('q-drawer') as drawer:
@@ -207,7 +209,7 @@ body {
                 ui.label('Civeng Cal').style('color:white')
 
         with ui.row().classes('items-center'):
-            ui.image(r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\nicegui\logogoftest.gif').style('width:45px')
+            ui.image('/filez/logogoftest.gif').style('width:45px')
 
             user_info = app.storage.user.get('user_info', {})
             logged_in = _is_valid(user_info)
@@ -249,13 +251,13 @@ body {
 #content
     with ui.column().style('padding:10px').classes('w-full'):
 #background: linear-gradient(135deg, #1A1A1A, #262626 );
-        with ui.carousel(animated=True).classes('w-fit').style('background:linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)),url("/assets/steel_frame_strusture.png"); background-position: center top;background-repeat: no-repeat;  color:white ;width: 100%; border-radius:25px ; box-shadow: 0 50px 200px rgba(66, 13, 242, 0.4)'):
+        with ui.carousel(animated=True).classes('w-fit').style('background:linear-gradient(rgba(0,0,0,0.3), rgba(0,0,0,0.7)),url("/filez/steel_frame_strusture.png"); background-position: center top;background-repeat: no-repeat;  color:white ;width: 100%; border-radius:25px ; box-shadow: 0 50px 200px rgba(66, 13, 242, 0.4)'):
             #background-size: cover;
             with ui.carousel_slide().classes('w-full'):
                 with ui.column().classes('w-full h-full items-center justify-center'):
                     ui.label('Share it :/')
                 #ui.image(r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\windlogo3339new.ico').style('width:50px')
-                    ui.image('qr_code.png').style('width:150px; border-radius:25px;')
+                    ui.image('/filez/qr_code.png').style('width:150px; border-radius:25px;')
                     ui.label('/Direction of Pr. Hamid Hamli Ben Zahar')
                     ui.label('/Developed by Mr. Rebouh Abdelbasat')
                     
@@ -272,7 +274,7 @@ body {
                             elif status == 'approved':ui.button('Download CNC Cal').style('background-color:#420DF2 ; font-weight: bold; text-transform: none; border-radius:100px; box-shadow: 0 8px 25px rgba(66, 13, 242, 0.45);').props('flat color=white')
 
                     if not logged_in:
-                        ui.button(on_click=lambda: ui.navigate.to('/login')).style('text-transform: none; background-color:white ;background-image: url("/assets/google.jpg");background-size: contain;background-position: center;background-repeat: no-repeat; border-radius:100px; width:120px; box-shadow: 0 8px 25px rgba(255, 255, 255, 0.45);').props('flat color=black')
+                        ui.button(on_click=lambda: ui.navigate.to('/login')).style('text-transform: none; background-color:white ;background-image: url("/filez/google.jpg");background-size: contain;background-position: center;background-repeat: no-repeat; border-radius:100px; width:120px; box-shadow: 0 8px 25px rgba(255, 255, 255, 0.45);').props('flat color=black')
 #'Sign in',icon='login',
                     #ui.label('_updates: we enhanced the adding features v0.1 ').classes('text-center').style('color:red; padding-top:0px; background-color:white')
 
@@ -445,10 +447,10 @@ body {
             ui.label('➥ Cladding Legende:').style('color:white').classes('items-center justify-between')
             with ui.element().style('border-radius:25px; overflow:hidden').classes('w-full'):
                 #overflow:hidden
-                app.add_static_files('/models', r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\nicegui')
+                #app.add_static_files('/models', r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\nicegui')
                 with ui.scene(fps=120,camera=ui.scene.orthographic_camera(size=3.5),background_color='#222',grid=(1, 1)).classes('w-full') as scene:
             #scene.axes_helper()
-                    model = scene.gltf('/models/scene333.glb')
+                    model = scene.gltf('/filez/scene333.glb')
                     model.scale(1)
                     model.rotate(1.57, 0, 0)
                     model.move(0, 0, 0)  
@@ -473,10 +475,10 @@ body {
         ui.label('2026-2027').style('color:white').style('padding-bottom:10px').classes('text-center')
 
 
-    app.add_static_files(
-        '/assets',
-        r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy'
-    )
+    #app.add_static_files(
+    #    '/assets',
+    #    r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy'
+    #)
 
 
 
@@ -514,4 +516,4 @@ async def google_oauth(request: Request) -> RedirectResponse:
 #print(secrets.token_hex(32))
 
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(host='0.0.0.0',port=int(os.environ.get('PORT', 8080)),storage_secret='aa4c0deafc3e66b1ce6d18efa52a0d6a4e96ceb5c18ebed69282375632062447', title='Rnv Calc', favicon=r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\windlogo3339new.ico')
+    ui.run(host='localhost', storage_secret='aa4c0deafc3e66b1ce6d18efa52a0d6a4e96ceb5c18ebed69282375632062447', title='Rnv Calc', favicon=r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\windlogo3339new.ico')
