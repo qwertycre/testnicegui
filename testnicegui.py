@@ -516,4 +516,4 @@ async def google_oauth(request: Request) -> RedirectResponse:
 #print(secrets.token_hex(32))
 
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(host='localhost', storage_secret='aa4c0deafc3e66b1ce6d18efa52a0d6a4e96ceb5c18ebed69282375632062447', title='Rnv Calc', favicon=r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\windlogo3339new.ico')
+    ui.run(host='0.0.0.0',port=int(os.environ.get('PORT', 8080)), storage_secret='aa4c0deafc3e66b1ce6d18efa52a0d6a4e96ceb5c18ebed69282375632062447', title='Rnv Calc', favicon=r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\windlogo3339new.ico')
