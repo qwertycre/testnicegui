@@ -3,6 +3,8 @@ from nicegui import ui
 #import qrcode
 import os
 
+import requests
+
 from nicegui import app, ui
 
 from fastapi.responses import RedirectResponse
@@ -17,57 +19,63 @@ from authlib.integrations.starlette_client import OAuth, OAuthError
 from fastapi import Request
 from starlette.responses import RedirectResponse
 
-
-
 from pathlib import Path
 
-USERS_FILE = Path(__file__).parent / Path('users.txt')
+
+SCRIPT_URL = "https://script.google.com/macros/s/AKfycbzxgfdR12nLIMd0Nwaf-xfpcysxIDi7UST_o9DhlL2ryO9nCRvyA-XgwIstimL9KsY_vA/exec"
 
 def save_user(user):
-    line = f'{user["id"]}|{user["email"]}|{user["name"]}|not_requested\n'
 
-    if USERS_FILE.exists():
-        for l in USERS_FILE.read_text(encoding='utf-8').splitlines():
-            if l.startswith(user["id"] + "|"):
-                return
+    r = requests.post(
+        SCRIPT_URL,
+        json={
+            "action": "save_user",
+            "id": user["id"],
+            "email": user["email"],
+            "name": user["name"],
+        },
+        timeout=10,
+    )
 
-    with USERS_FILE.open('a', encoding='utf-8') as f:
-        f.write(line)
+    return r.json()
 
 
 
 
 def request_access(user_id):
 
-    lines = USERS_FILE.read_text(encoding='utf-8').splitlines()
-
-    new_lines = []
-
-    for line in lines:
-
-        uid, email, name, status = line.split('|')
-
-        if uid == user_id:
-            status = 'pending'
-
-        new_lines.append(f'{uid}|{email}|{name}|{status}')
-
-    USERS_FILE.write_text('\n'.join(new_lines), encoding='utf-8')
+    requests.post(
+        SCRIPT_URL,
+        json={
+            "action": "request_access",
+            "id": user_id,
+        },
+        timeout=10,
+    )
 
 
 
 
 def get_status(user_id):
-    if not USERS_FILE.exists():
+
+    r = requests.post(
+        SCRIPT_URL,
+        json={
+            "action": "get_status",
+            "id": user_id,
+        },
+        timeout=10,
+    )
+
+    data = r.json()
+
+    if not data.get("exists"):
         return None
 
-    for line in USERS_FILE.read_text(encoding='utf-8').splitlines():
-        uid, email, name, status = line.split('|')
+    if data.get("banned"):
+        return "banned"
 
-        if uid == user_id:
-            return status
-
-    return None
+    return data["status"]
 
 
 
@@ -217,8 +225,21 @@ body {
             if not logged_in:
                 app.storage.user.pop('user_info', None)
                 status = None
+
             else:
-                status = get_status(user_info['sub'])
+                result = save_user({
+                    "id": user_info["sub"],
+                    "email": user_info["email"],
+                    "name": user_info["name"],
+                })
+
+                if result["banned"]:
+                    app.storage.user.pop("user_info", None)
+                    ui.notify("Your account has been banned.", color="negative")
+                    ui.navigate.reload()
+                    return
+
+                status = result["status"]
         
             if logged_in:
                 with ui.button(icon='account_circle').props('round flat color=white size=15px') as btn:
@@ -516,4 +537,4 @@ async def google_oauth(request: Request) -> RedirectResponse:
 #print(secrets.token_hex(32))
 
 if __name__ in {"__main__", "__mp_main__"}:
-    ui.run(host='0.0.0.0',port=int(os.environ.get('PORT', 8080)), storage_secret='aa4c0deafc3e66b1ce6d18efa52a0d6a4e96ceb5c18ebed69282375632062447', title='Rnv Calc', favicon=r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\windlogo3339new.ico')
+    ui.run(host='localhost', storage_secret='aa4c0deafc3e66b1ce6d18efa52a0d6a4e96ceb5c18ebed69282375632062447', title='Rnv Calc', favicon=r'C:\Users\x\Documents\ANACONDA TP\CHARPENTE_PRGRM\justfortesting Qtpy\windlogo3339new.ico')
